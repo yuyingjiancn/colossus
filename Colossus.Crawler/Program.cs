@@ -236,6 +236,19 @@ namespace Colossus.Crawler
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(html);
             HtmlNodeCollection  nli = doc.DocumentNode.SelectNodes("//li[@class=\"j_thread_list\"]");
+            if (nli == null) {
+                using (var session = sessionFactory.OpenSession())
+                {
+                    session.SaveOrUpdate(new ErrorLog
+                    {
+                        CrawlMissionId = missionId,
+                        LogType = "thread list crawl empty thread list err",
+                        Log = String.Format("page number: [{0}]", threadListPageNo),
+                        At = DateTime.Now
+                    });
+                }
+                return;
+            }
 
             foreach (var n in nli)
             {
@@ -378,6 +391,19 @@ namespace Colossus.Crawler
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(html);
             HtmlNodeCollection nDiv = doc.DocumentNode.SelectNodes("//div[contains(concat(\" \", @class, \" \"), \"l_post\")]");
+            if (nDiv == null) {
+                using (var session = sessionFactory.OpenSession())
+                {
+                    session.SaveOrUpdate(new ErrorLog
+                    {
+                        CrawlMissionId = missionId,
+                        LogType = "post list crawl empty post list error",
+                        Log = String.Format("thread id: [{0}];page number: [{1}]", threadId, postListPageNo),
+                        At = DateTime.Now
+                    });
+                }
+                return;
+            }
             
             foreach (var n in nDiv)
             {
@@ -539,6 +565,19 @@ namespace Colossus.Crawler
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(html);
             HtmlNodeCollection nDiv = doc.DocumentNode.SelectNodes("//li[contains(concat(\" \", @class, \" \"), \"lzl_single_post\")]");
+            if (nDiv == null) {
+                using (var session = sessionFactory.OpenSession())
+                {
+                    session.SaveOrUpdate(new ErrorLog
+                    {
+                        CrawlMissionId = missionId,
+                        LogType = "reply list crawl reply list empty error",
+                        Log = String.Format("thread id: [{0}];post id: [{1}];page number: [{2}]", threadId, postId, replyListPageNo),
+                        At = DateTime.Now
+                    });
+                }
+                return;
+            }
 
             foreach (var n in nDiv)
             {
