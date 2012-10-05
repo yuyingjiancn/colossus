@@ -169,7 +169,7 @@ namespace Colossus.Crawler
                     .AddFromAssemblyOf<JReply>()
                     .AddFromAssemblyOf<JPostMap>()
                     .AddFromAssemblyOf<JThreadMap>())
-                //.ExposeConfiguration(BuildSchema)
+                .ExposeConfiguration(BuildSchema)
                 .BuildSessionFactory();
         }
         private static void BuildSchema(Configuration config)
@@ -208,6 +208,24 @@ namespace Colossus.Crawler
                 html = string.Empty; //不管是何种情况只要页面未获取则页面的html被设备string.Empty
             }
             return html; //html为空代表页面获取失败
+        }
+
+        /// <summary>
+        /// 根据xpath抓取最后一页的a link的页码
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="queryPath"></param>
+        /// <param name="getNumFromLinkHref"></param>
+        /// <returns></returns>
+        static int getNextPageNum(HtmlDocument doc, string queryPath, Func<string,int> getNumFromLinkHref) {
+            var pageNum = 0;
+            var aNextPage = doc.DocumentNode.SelectSingleNode(queryPath);          
+            if (aNextPage != null)
+            {
+                var linkHref = aNextPage.Attributes["href"].Value;
+                pageNum = getNumFromLinkHref(linkHref);
+            }
+            return pageNum;
         }
 
         static void ThreadCrawl(int threadListPageNo=0){
@@ -358,12 +376,13 @@ namespace Colossus.Crawler
                 }
             }
 
-            var aNextPage = doc.DocumentNode.SelectSingleNode("//a[@class=\"next\"]");
-            if (aNextPage != null) {
-                var nextPageNo = int.Parse(aNextPage.Attributes["href"].Value.Replace("/f?kw=" + tiebaName + "&pn=", ""));
-                if (threadListCrawlMaxPage == 0 || threadListCrawlMaxPage >= nextPageNo)
+            var nextPageNum = getNextPageNum(doc, "//a[@class=\"next\"]", href => {
+                return int.Parse(href.Replace("/f?kw=" + tiebaName + "&pn=", ""));
+            });
+            if (nextPageNum != 0) {
+                if (threadListCrawlMaxPage == 0 || threadListCrawlMaxPage >= nextPageNum)
                 {
-                    ThreadCrawl(nextPageNo);
+                    ThreadCrawl(nextPageNum);
                 }
             }
         }
@@ -402,7 +421,19 @@ namespace Colossus.Crawler
                         At = DateTime.Now
                     });
                 }
+                var nextPageNum = getNextPageNum(doc, "//ul[@class=\"l_posts_num\"]//a[text()=\"下一页\"]", href =>
+                {
+                    return int.Parse(href.Replace(string.Format("/p/{0}?pn=", threadId), ""));
+                });
+                if (nextPageNum != 0)
+                {
+                    if (postListCrawlMaxPage == 0 || nextPageNum <= postListCrawlMaxPage)
+                    {
+                        PostCrawl(threadId, ref parentThreadPostIdArr, nextPageNum);
+                    }
+                }
                 return;
+                
             }
             
             foreach (var n in nDiv)
@@ -530,13 +561,15 @@ namespace Colossus.Crawler
                     }
                 }
             }
-            var aNextPage = doc.DocumentNode.SelectSingleNode("//ul[@class=\"l_posts_num\"]//a[text()=\"下一页\"]");
-            if (aNextPage != null)
+            var nextPageNum2 = getNextPageNum(doc, "//ul[@class=\"l_posts_num\"]//a[text()=\"下一页\"]", href =>
             {
-                var nextPageNo = int.Parse(aNextPage.Attributes["href"].Value.Replace(string.Format("/p/{0}?pn=", threadId), ""));
-                if (postListCrawlMaxPage == 0 || nextPageNo <= postListCrawlMaxPage)
+                return int.Parse(href.Replace(string.Format("/p/{0}?pn=", threadId), ""));
+            });
+            if (nextPageNum2 != 0)
+            {
+                if (postListCrawlMaxPage == 0 || nextPageNum2 <= postListCrawlMaxPage)
                 {
-                    PostCrawl(threadId, ref parentThreadPostIdArr, nextPageNo);
+                    PostCrawl(threadId, ref parentThreadPostIdArr, nextPageNum2);
                 }
             }
         }
@@ -575,6 +608,17 @@ namespace Colossus.Crawler
                         Log = String.Format("thread id: [{0}];post id: [{1}];page number: [{2}]", threadId, postId, replyListPageNo),
                         At = DateTime.Now
                     });
+                }
+                var nextPageNum = getNextPageNum(doc, "//p[contains(concat(\" \", @class, \" \"), \"j_pager\")]/a[text()=\"下一页\"]", href =>
+                {
+                    return int.Parse(href.Replace("#", ""));
+                });
+                if (nextPageNum != 0)
+                {
+                    if (replyListCrawlMaxPage == 0 || nextPageNum <= replyListCrawlMaxPage)
+                    {
+                        ReplyCrawl(threadId, postId, ref parentReplyIdsArr, nextPageNum);
+                    }
                 }
                 return;
             }
@@ -616,13 +660,15 @@ namespace Colossus.Crawler
                     }
                 }
             }
-            var aNextPage = doc.DocumentNode.SelectSingleNode("//p[contains(concat(\" \", @class, \" \"), \"j_pager\")]/a[text()=\"下一页\"]");
-            if (aNextPage != null)
+            var nextPageNum2 = getNextPageNum(doc, "//p[contains(concat(\" \", @class, \" \"), \"j_pager\")]/a[text()=\"下一页\"]", href =>
             {
-                var nextPageNo = int.Parse(aNextPage.Attributes["href"].Value.Replace("#", ""));
-                if (replyListCrawlMaxPage == 0 || nextPageNo <= replyListCrawlMaxPage)
+                return int.Parse(href.Replace("#", ""));
+            });
+            if (nextPageNum2 != 0)
+            {
+                if (replyListCrawlMaxPage == 0 || nextPageNum2 <= replyListCrawlMaxPage)
                 {
-                    ReplyCrawl(threadId, postId, ref parentReplyIdsArr, nextPageNo);
+                    ReplyCrawl(threadId, postId, ref parentReplyIdsArr, nextPageNum2);
                 }
             }
         }
