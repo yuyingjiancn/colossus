@@ -16,12 +16,6 @@
           %input.input-medium.search-query{:type => 'text', :id => 'endDatetime', :value => "#{@end_time}"}
           %button.btn{:style => "margin-left:8px;", :id => 'btn_goto'}= 'goto^^'
       .well
-        .pagination
-          %ul
-            - @page_num.times do |num|
-              %li
-                %a{:href=>"/threadlist/between/#{@start_time_url}/to/#{@end_time_url}/limit/#{@page_limit}/#{(num*50)}"}
-                  = "#{num+1}"
         %table.table.table-hover
           %thead
             %tr
