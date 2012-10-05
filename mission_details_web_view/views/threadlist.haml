@@ -1,0 +1,50 @@
+!!! 5
+%html
+  %head
+    %title
+      =@title
+    %link{:rel => 'stylesheet', :href => '/static/bootstrap/css/bootstrap.min.css'}
+    %link{:rel => 'stylesheet', :href => '/static/kendoui/styles/kendo.common.min.css'}
+    %link{:rel => 'stylesheet', :href => '/static/kendoui/styles/kendo.blueopal.min.css'}
+  %body
+    .container
+      %div{:style=>'margin-top: 18px;'}
+        %form.search
+          %span= "Query By Datetime Between(total updated: <strong>#{@count}</strong>):"
+          %input.input-medium.search-query{:type => 'text', :id => 'startDatetime', :value => "#{@start_time}"}
+          %span= 'and '
+          %input.input-medium.search-query{:type => 'text', :id => 'endDatetime', :value => "#{@end_time}"}
+          %button.btn{:style => "margin-left:8px;", :id => 'btn_goto'}= 'goto^^'
+      .well
+        .pagination
+          %ul
+            - @page_num.times do |num|
+              %li
+                %a{:href=>"/threadlist/between/#{@start_time_url}/to/#{@end_time_url}/limit/#{@page_limit}/#{(num*50)}"}
+                  = "#{num+1}"
+        %table.table.table-hover
+          %thead
+            %tr
+              %th= "title"
+              %th= "author"
+              %th= "update time"
+          %tbody
+            - @threads.each do |thread|
+              %tr
+                %td
+                  %a{:href=>"/threadid/#{thread.id}/postlist/between/#{@start_time_url}/to/#{@end_time_url}/limit/50/0"}
+                    = "#{thread.title}"
+                %td= "#{thread.author}"
+                %td= "#{thread.updateat}"
+        .pagination
+          %ul
+            - @page_num.times do |num|
+              %li
+                %a{:href=>"/threadlist/between/#{@start_time_url}/to/#{@end_time_url}/limit/#{@page_limit}/#{(num*@page_limit)}"}
+                  = "#{num+1}"
+
+    %script{:type => 'text/javascript', :src  => '/static/js/jquery-1.8.2.min.js'}
+    %script{:type => 'text/javascript', :src  => '/static/bootstrap/js/bootstrap.min.js'}
+    %script{:type => 'text/javascript', :src  => '/static/kendoui/js/kendo.web.min.js'}
+    %script{:type => 'text/javascript', :src  => '/static/kendoui/js/cultures/kendo.culture.zh-CN.min.js'}
+    %script{:type => 'text/javascript', :src  => '/threadlist.js'}

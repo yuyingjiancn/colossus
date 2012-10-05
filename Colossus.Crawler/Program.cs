@@ -169,7 +169,7 @@ namespace Colossus.Crawler
                     .AddFromAssemblyOf<JReply>()
                     .AddFromAssemblyOf<JPostMap>()
                     .AddFromAssemblyOf<JThreadMap>())
-                //.ExposeConfiguration(BuildSchema)
+                //.ExposeConfiguration(BuildSchema) //创建数据库结构，调试的时候用^^
                 .BuildSessionFactory();
         }
         private static void BuildSchema(Configuration config)
@@ -301,6 +301,7 @@ namespace Colossus.Crawler
                     ZhiDing = (bool)thread["zhi_ding"],
                     Ding = (bool)thread["ding"],
                     Jing = (bool)thread["jing"],
+                    Pub = DateTime.Now,
                     CreateAt = (DateTime)thread["create_at"],
                     UpdateAt = (DateTime)thread["update_at"]
                 };
@@ -689,7 +690,7 @@ namespace Colossus.Crawler
                 connectionStr = configHash["connection_string"].ToString();
             }
             catch {
-                Console.WriteLine("配置文件未找到...程序退出。");
+                Console.WriteLine("配置文件未找到或配置参数错误，程序退出。");
                 return;
             }
 
@@ -712,7 +713,7 @@ namespace Colossus.Crawler
                 sessionFactory = CreateSessionFactory();
                 using (var session = sessionFactory.OpenSession())
                 {
-                    missionId = (int)session.Save(new CrawlMission { Start = DateTime.Now });
+                    missionId = (int)session.Save(new CrawlMission { Start = DateTime.Now, Finish = DateTime.Now });
                 }
                 ThreadCrawl(crawlStartIndex);
                 using (var session = sessionFactory.OpenSession())

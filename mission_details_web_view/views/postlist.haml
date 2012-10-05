@@ -1,0 +1,44 @@
+!!! 5
+%html
+  %head
+    %title
+      =@title
+    %link{:rel => 'stylesheet', :href => '/static/bootstrap/css/bootstrap.min.css'}
+    %link{:rel => 'stylesheet', :href => '/static/js/jquery-ui-1.8.24.custom/css/cupertino/jquery-ui-1.8.24.custom.css'}
+  %body
+    .container
+      %div{:style=>'margin-top: 18px;'}
+        %form.search
+          %button.btn{:id => 'btn_remove_protected_images'}= 'remove protected images'
+          %a{:style => "margin-left:16px;", :href => "/threadlist/between/#{@start_time_url}/to/#{@end_time_url}/limit/50/0"}
+            = "back to threads list"
+      .well
+        .alert.alert-info= "[帖子标题]#{@thread.title}--[发布人]#{@thread.author}--[发布时间]#{@thread.updateat}"
+
+        %table.table.table-hover
+          %thead
+            %tr
+              %th
+                = "post"
+              %th= "author"
+              %th= "update time"
+          %tbody
+            - @posts.each do |post|
+              %tr
+                %td
+                  = "#{post.content}"
+                  - post.j_replies_dataset.where(:updateat => "#{@start_time}".."#{@end_time}").order(:pub).each do |reply|
+                    .alert.alert-success= "<strong>#{reply.author}</strong>::#{reply.content}"
+                %td= "#{post.author}"
+                %td= "#{post.updateat}"
+        .pagination
+          %ul
+            - @page_num.times do |num|
+              %li
+                %a{:href=>"/threadid/#{@thread.id}/postlist/between/#{@start_time_url}/to/#{@end_time_url}/limit/#{@page_limit}/#{num*@page_limit}"}
+                  = "#{num+1}"
+
+    %script{:type => 'text/javascript', :src  => '/static/js/jquery-1.8.2.min.js'}
+    %script{:type => 'text/javascript', :src  => '/static/bootstrap/js/bootstrap.min.js'}
+    %script{:type => 'text/javascript', :src  => '/static/js/jquery-ui-1.8.24.custom/js/jquery-ui-1.8.24.custom.min.js'}
+    %script{:type => 'text/javascript', :src  => '/postlist.js'}

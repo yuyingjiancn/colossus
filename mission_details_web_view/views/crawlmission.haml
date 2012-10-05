@@ -1,0 +1,39 @@
+!!! 5
+%html
+  %head
+    %title
+      =@title
+    %link{:rel => 'stylesheet', :href => '/static/bootstrap/css/bootstrap.min.css'}
+    %link{:rel => 'stylesheet', :href => '/static/kendoui/styles/kendo.common.min.css'}
+    %link{:rel => 'stylesheet', :href => '/static/kendoui/styles/kendo.blueopal.min.css'}
+  %body
+    .container
+      .well{:style => "margin-top:16px;"}
+        .alert.alert-error= "<strong>crawl missions list</strong>"
+        %table.table.table-hover
+          %thead
+            %tr
+              %th= "mission id"
+              %th= "start time"
+              %th= "finish time"
+              %th= "goto^^"
+          %tbody
+            - @crawl_missions.each do |m|
+              %tr
+                %td= "#{m.id}"
+                %td= "#{m.start}"
+                %td= "#{m.finish}"
+                %td
+                  %a{:href => "/threadlist/between/#{m.start.strftime('%Y/%m/%d/%H/%M/%S')}/to/#{m.finish.strftime('%Y/%m/%d/%H/%M/%S')}/limit/50/0"}
+                    = "see updates details^^"
+        .pagination
+          %ul
+            - @page_num.times do |num|
+              %li
+                %a{:href=>"/crawlmissionlist/#{@page_limit}/#{(num*@page_limit)}"}
+                  = "#{num+1}"
+
+    %script{:type => 'text/javascript', :src  => '/static/js/jquery-1.8.2.min.js'}
+    %script{:type => 'text/javascript', :src  => '/static/bootstrap/js/bootstrap.min.js'}
+    %script{:type => 'text/javascript', :src  => '/static/kendoui/js/kendo.web.min.js'}
+    %script{:type => 'text/javascript', :src  => '/static/kendoui/js/cultures/kendo.culture.zh-CN.min.js'}
