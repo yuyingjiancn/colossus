@@ -690,6 +690,7 @@ namespace Colossus.Crawler
             }
             catch {
                 Console.WriteLine("配置文件未找到...程序退出。");
+                return;
             }
 
 
