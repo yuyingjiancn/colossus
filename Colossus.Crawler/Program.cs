@@ -169,7 +169,7 @@ namespace Colossus.Crawler
                     .AddFromAssemblyOf<JReply>()
                     .AddFromAssemblyOf<JPostMap>()
                     .AddFromAssemblyOf<JThreadMap>())
-                .ExposeConfiguration(BuildSchema)
+                //.ExposeConfiguration(BuildSchema)
                 .BuildSessionFactory();
         }
         private static void BuildSchema(Configuration config)
