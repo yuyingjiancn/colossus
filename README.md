@@ -45,6 +45,7 @@ gem install pg
 db下的init文件修改数据库连接配置^^
 转到mission_details_web_view目录下执行 ruby -rubygems app.rb
 打开http://localhost:8080/ 就可以使用了^^
+BTW:请用firefox或者chrome查看，我用bootstrap，ie6肯定看不了。
 
 问题
 ========
