@@ -327,6 +327,15 @@ namespace Colossus.Crawler
                         sameThreadCount = 0;
                     }
                     else {
+                        if (jthreadInDB.ReplyNum != jthread.ReplyNum)
+                        {
+                            needReCrawlPost = true;
+                            sameThreadCount = 0;
+                        }
+                        else
+                        {
+                            sameThreadCount++;
+                        }   
                         //thread被回复或者thread的置顶 顶 精状态被修改 则更新thread的更新时间
                         if (jthreadInDB.ReplyNum != jthread.ReplyNum ||
                             jthreadInDB.ZhiDing != jthread.ZhiDing ||
@@ -340,15 +349,7 @@ namespace Colossus.Crawler
                             jthreadInDB.Jing = jthread.Jing;
                             session.Update(jthreadInDB);
                             session.Flush();
-                        }
-                        if (jthreadInDB.ReplyNum != jthread.ReplyNum)
-                        {
-                            needReCrawlPost = true;
-                            sameThreadCount = 0;
-                        }
-                        else {
-                            sameThreadCount++;
-                        }             
+                        }                            
                     }
                 }
                 if (needReCrawlPost) {
