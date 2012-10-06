@@ -719,6 +719,7 @@ namespace Colossus.Crawler
                 using (var session = sessionFactory.OpenSession())
                 {
                     var crawlMission = session.Query<CrawlMission>().Single(cm => cm.Id == missionId);
+                    crawlMission.Finish = DateTime.Now;
                     session.Update(crawlMission);
                     session.Flush();
                 }
