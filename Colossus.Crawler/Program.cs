@@ -422,19 +422,7 @@ namespace Colossus.Crawler
                         At = DateTime.Now
                     });
                 }
-                var nextPageNum = getNextPageNum(doc, "//ul[@class=\"l_posts_num\"]//a[text()=\"下一页\"]", href =>
-                {
-                    return int.Parse(href.Replace(string.Format("/p/{0}?pn=", threadId), ""));
-                });
-                if (nextPageNum != 0)
-                {
-                    if (postListCrawlMaxPage == 0 || nextPageNum <= postListCrawlMaxPage)
-                    {
-                        PostCrawl(threadId, ref parentThreadPostIdArr, nextPageNum);
-                    }
-                }
                 return;
-                
             }
             
             foreach (var n in nDiv)
@@ -489,6 +477,7 @@ namespace Colossus.Crawler
                 parentThreadPostIdArr.Add(jpost.Id);
 
                 //如果是一楼 获取发布时间 更新thread的发布时间-_-
+                
                 if (jpost.Floor == 1) {
                     using (var session = sessionFactory.OpenSession()) {
                         var t = session.Query<JThread>().Single(x => x.Id == threadId);
@@ -609,17 +598,6 @@ namespace Colossus.Crawler
                         Log = String.Format("thread id: [{0}];post id: [{1}];page number: [{2}]", threadId, postId, replyListPageNo),
                         At = DateTime.Now
                     });
-                }
-                var nextPageNum = getNextPageNum(doc, "//p[contains(concat(\" \", @class, \" \"), \"j_pager\")]/a[text()=\"下一页\"]", href =>
-                {
-                    return int.Parse(href.Replace("#", ""));
-                });
-                if (nextPageNum != 0)
-                {
-                    if (replyListCrawlMaxPage == 0 || nextPageNum <= replyListCrawlMaxPage)
-                    {
-                        ReplyCrawl(threadId, postId, ref parentReplyIdsArr, nextPageNum);
-                    }
                 }
                 return;
             }
